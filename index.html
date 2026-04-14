@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Shelf — Book Ratings</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+/* CSS remains identical to your original */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#12101a;--bg2:#1a1726;--bg3:#211e30;--card:#1e1b2e;--card2:#252238;
@@ -20,23 +22,15 @@
 html,body{height:100%}
 body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;position:relative}
 body::after{content:'';position:fixed;top:-100px;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse at center,rgba(130,80,200,0.10) 0%,transparent 70%);pointer-events:none;z-index:0}
-
-/* NIGHT SKY CORNER */
 .night-sky{position:fixed;top:0;right:0;width:440px;height:440px;pointer-events:none;z-index:1;overflow:hidden}
 .night-sky svg{position:absolute;top:0;right:0;width:100%;height:100%}
-
-/* HEADER */
 header{position:relative;z-index:10;text-align:center;padding:2.5rem 1rem 0}
 .logo{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,5vw,3.2rem);font-weight:700;color:var(--text);line-height:1}
 .logo span{color:var(--accent);font-style:italic}
 .tagline{font-family:'Crimson Pro',serif;font-style:italic;font-weight:300;font-size:1.05rem;color:var(--text2);margin-top:.35rem;letter-spacing:.03em}
-
-/* TABS */
 .tabs{display:flex;justify-content:center;margin:1.8rem auto 0;max-width:340px;background:var(--bg3);border-radius:40px;padding:5px;border:1px solid var(--border);position:relative;z-index:10}
 .tab-btn{flex:1;padding:.55rem 1.2rem;border:none;background:transparent;border-radius:35px;font-family:'Space Mono',monospace;font-size:.75rem;color:var(--text2);cursor:pointer;transition:all .25s;letter-spacing:.02em}
 .tab-btn.active{background:var(--accent);color:#1a0d35;font-weight:700}
-
-/* MAIN */
 main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2rem 4rem}
 .tab-panel{display:none}.tab-panel.active{display:block}
 .shelf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.8rem;flex-wrap:wrap;gap:.8rem}
@@ -44,14 +38,10 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 .legend{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
 .legend-item{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--text2)}
 .legend-dot{width:10px;height:10px;border-radius:50%}
-
-/* GRID */
 .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1.4rem}
 .empty-state{grid-column:1/-1;text-align:center;padding:5rem 2rem}
 .empty-state p{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:var(--text3)}
 .empty-state small{display:block;margin-top:.5rem;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--text3)}
-
-/* CARD */
 .book-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
 .book-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 16px 40px rgba(0,0,0,.5)}
 .book-cover-wrap{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--bg3)}
@@ -65,8 +55,6 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 .book-info{padding:.82rem .88rem .68rem}
 .book-title{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;line-height:1.3;color:var(--text);margin-bottom:.2rem}
 .book-author{font-family:'Crimson Pro',serif;font-style:italic;font-size:.82rem;color:var(--text2);margin-bottom:.82rem}
-
-/* RATINGS */
 .ratings-block{display:flex;flex-direction:column;gap:.4rem}
 .rater-row{display:flex;align-items:center;gap:.5rem}
 .rater-label{font-family:'Space Mono',monospace;font-size:.6rem;width:42px;flex-shrink:0;letter-spacing:.03em}
@@ -76,8 +64,6 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 .star.on{color:var(--star-on)}.star:hover{transform:scale(1.2)}
 .review-icon{width:18px;height:18px;flex-shrink:0;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;transition:background .15s}
 .review-icon:hover{background:var(--bg3)}.review-icon.has-review{color:var(--accent2)}.review-icon.no-review{color:var(--text3)}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(10,8,20,.82);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:1.8rem;max-width:420px;width:100%;transform:translateY(16px);transition:transform .25s}
@@ -90,8 +76,6 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 .btn{font-family:'Space Mono',monospace;font-size:.72rem;padding:.55rem 1.1rem;border-radius:30px;border:1px solid var(--border2);cursor:pointer;transition:all .15s;letter-spacing:.03em}
 .btn-ghost{background:transparent;color:var(--text2)}.btn-ghost:hover{background:var(--bg3)}
 .btn-primary{background:var(--accent);color:#1a0d35;border-color:var(--accent);font-weight:700}.btn-primary:hover{background:#d8bcff}
-
-/* ADD BOOK */
 .add-panel{max-width:580px;margin:0 auto}
 .add-panel h2{font-family:'Playfair Display',serif;font-size:1.7rem;margin-bottom:.35rem}
 .add-panel .add-sub{font-style:italic;color:var(--text2);margin-bottom:2rem;font-size:1rem}
@@ -134,17 +118,13 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
     <linearGradient id="shot" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#fff" stop-opacity="0.75"/></linearGradient>
   </defs>
   <rect width="440" height="440" fill="url(#skyG)"/>
-  <!-- Moon glow + body -->
   <circle cx="378" cy="52" r="68" fill="url(#moonH)" opacity="0.38"/>
   <circle cx="378" cy="52" r="26" fill="#fff8e0" opacity="0.93" filter="url(#fs)"/>
   <circle cx="391" cy="47" r="21" fill="#180e2e" opacity="0.88"/>
-  <!-- Nebula wisps -->
   <ellipse cx="285" cy="98" rx="40" ry="14" fill="rgba(180,130,255,0.055)" transform="rotate(-22,285,98)"/>
   <ellipse cx="345" cy="180" rx="32" ry="11" fill="rgba(100,180,230,0.045)" transform="rotate(-12,345,180)"/>
-  <!-- Shooting star -->
   <line x1="160" y1="28" x2="198" y2="63" stroke="url(#shot)" stroke-width="0.9"/>
   <circle cx="160" cy="28" r="0.9" fill="#fff" opacity="0.8"/>
-  <!-- Bright stars with sparkles -->
   <g filter="url(#fg)">
     <circle cx="292" cy="24" r="1.9" fill="#fff" opacity="0.96"/>
     <circle cx="250" cy="54" r="1.7" fill="#fff8f0" opacity="0.90"/>
@@ -156,7 +136,6 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
     <circle cx="164" cy="68" r="1.2" fill="#fff8e0" opacity="0.75"/>
     <circle cx="395" cy="110" r="1.0" fill="#e8d8ff" opacity="0.68"/>
   </g>
-  <!-- Sparkle crosses on brightest -->
   <g opacity="0.62" filter="url(#fg)">
     <line x1="292" y1="20.5" x2="292" y2="27.5" stroke="#fff8e0" stroke-width="0.55"/>
     <line x1="288.5" y1="24" x2="295.5" y2="24" stroke="#fff8e0" stroke-width="0.55"/>
@@ -169,7 +148,6 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
     <line x1="250" y1="50.5" x2="250" y2="57.5" stroke="#fff" stroke-width="0.45"/>
     <line x1="246.5" y1="54" x2="253.5" y2="54" stroke="#fff" stroke-width="0.45"/>
   </g>
-  <!-- Medium stars -->
   <circle cx="235" cy="108" r="0.9" fill="#fff" opacity="0.68"/>
   <circle cx="302" cy="95" r="0.85" fill="#fff8e0" opacity="0.64"/>
   <circle cx="358" cy="142" r="0.9" fill="#d8eeff" opacity="0.62"/>
@@ -181,7 +159,6 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
   <circle cx="218" cy="145" r="0.75" fill="#e0d0ff" opacity="0.52"/>
   <circle cx="410" cy="195" r="0.85" fill="#fff" opacity="0.52"/>
   <circle cx="256" cy="195" r="0.7" fill="#fff8e0" opacity="0.50"/>
-  <!-- Small/dim stars -->
   <circle cx="130" cy="48" r="0.65" fill="#fff" opacity="0.48"/>
   <circle cx="188" cy="122" r="0.6" fill="#e8d8ff" opacity="0.45"/>
   <circle cx="370" cy="215" r="0.6" fill="#fff" opacity="0.43"/>
@@ -256,7 +233,7 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
             </div>
             <p class="cover-status" id="cover-status">awaiting title...</p>
           </div>
-          <div style="flex:1;min-width:160px;"><p style="font-size:.88rem;color:var(--text2);line-height:1.6;font-style:italic;">Cover art is fetched from Open Library automatically. If no cover is found a stylish placeholder shows instead.</p></div>
+          <div style="flex:1;min-width:160px;"><p style="font-size:.88rem;color:var(--text2);line-height:1.6;font-style:italic;">Cover art is fetched from Open Library automatically.</p></div>
         </div>
         <button class="btn btn-primary btn-add-book" id="btn-add" onclick="addBook()" disabled>Add to The Shelf</button>
       </div>
@@ -279,252 +256,31 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 <div class="toast" id="toast"></div>
 
 <script>
+// 2. INITIALIZE SUPABASE
+const SUPABASE_URL = 'YOUR_API_URL_HERE';
+const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const RATERS=['darian','joey','jami'];
-const KEY='theshelf_v4';
 let books=[];
 let modalState=null;
 let coverUrl=null;
 let coverTimer=null;
 
-function save(){try{localStorage.setItem(KEY,JSON.stringify(books));}catch(e){}}
+// 3. UPDATED LOAD: Fetch from Supabase
+async function load() {
+  const { data, error } = await _supabase
+    .from('books')
+    .select('*');
 
-function B(id,title,author,series){
-  return{id,title,author,series:series||'',coverUrl:null,
-         ratings:{darian:0,joey:0,jami:0},reviews:{darian:'',joey:'',jami:''}};
-}
-
-const SEED=[
-  // Empire of the Vampire (3)
-  B('eov1','Empire of the Vampire','Jay Kristoff','Empire of the Vampire'),
-  B('eov2','Empire of the Damned','Jay Kristoff','Empire of the Vampire'),
-  B('eov3','Empire of the Dawn','Jay Kristoff','Empire of the Vampire'),
-  // Shadow of the Gods / Bloodsworn Saga (3)
-  B('sg1','The Shadow of the Gods','John Gwynne','The Bloodsworn Saga'),
-  B('sg2','The Hunger of the Gods','John Gwynne','The Bloodsworn Saga'),
-  B('sg3','The Fury of the Gods','John Gwynne','The Bloodsworn Saga'),
-  // ACOTAR (6)
-  B('ac1','A Court of Thorns and Roses','Sarah J. Maas','ACOTAR'),
-  B('ac2','A Court of Mist and Fury','Sarah J. Maas','ACOTAR'),
-  B('ac3','A Court of Wings and Ruin','Sarah J. Maas','ACOTAR'),
-  B('ac4','A Court of Frost and Starlight','Sarah J. Maas','ACOTAR'),
-  B('ac5','A Court of Silver Flames','Sarah J. Maas','ACOTAR'),
-  B('ac6','A Court of Sword and Starlight','Sarah J. Maas','ACOTAR'),
-  // Throne of Glass (7)
-  B('tg1','Throne of Glass','Sarah J. Maas','Throne of Glass'),
-  B('tg2','Crown of Midnight','Sarah J. Maas','Throne of Glass'),
-  B('tg3','Heir of Fire','Sarah J. Maas','Throne of Glass'),
-  B('tg4','Queen of Shadows','Sarah J. Maas','Throne of Glass'),
-  B('tg5','Empire of Storms','Sarah J. Maas','Throne of Glass'),
-  B('tg6','Tower of Dawn','Sarah J. Maas','Throne of Glass'),
-  B('tg7','Kingdom of the Wicked','Sarah J. Maas','Throne of Glass'),
-  // Crescent City (3)
-  B('cc1','House of Earth and Blood','Sarah J. Maas','Crescent City'),
-  B('cc2','House of Sky and Breath','Sarah J. Maas','Crescent City'),
-  B('cc3','House of Flame and Shadow','Sarah J. Maas','Crescent City'),
-  // Red Rising (7)
-  B('rr1','Red Rising','Pierce Brown','Red Rising'),
-  B('rr2','Golden Son','Pierce Brown','Red Rising'),
-  B('rr3','Morning Star','Pierce Brown','Red Rising'),
-  B('rr4','Iron Gold','Pierce Brown','Red Rising'),
-  B('rr5','Dark Age','Pierce Brown','Red Rising'),
-  B('rr6','Light Bringer','Pierce Brown','Red Rising'),
-  B('rr7','Red God','Pierce Brown','Red Rising'),
-  // Malazan Book of the Fallen (10)
-  B('mz1','Gardens of the Moon','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz2','Deadhouse Gates','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz3','Memories of Ice','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz4','House of Chains','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz5','Midnight Tides','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz6','The Bonehunters','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz7',"Reaper's Gale",'Steven Erikson','Malazan Book of the Fallen'),
-  B('mz8','Toll the Hounds','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz9','Dust of Dreams','Steven Erikson','Malazan Book of the Fallen'),
-  B('mz10','The Crippled God','Steven Erikson','Malazan Book of the Fallen'),
-  // The Will of the Many / Hierarchy (2 so far)
-  B('wm1','The Will of the Many','James Islington','Hierarchy'),
-  B('wm2','The Strength of the Few','James Islington','Hierarchy'),
-  // The Serpent & the Scarlet Wing duology (user said "serpent and night" — this is The Jasad Heir)
-  B('jh1','The Jasad Heir','Sara Hashem','The Jasad Heir'),
-  B('jh2','The Scorched Throne','Sara Hashem','The Jasad Heir'),
-  // Cosmere — Elantris
-  B('cel','Elantris','Brandon Sanderson','Cosmere — Elantris'),
-  // Cosmere — Mistborn Era 1
-  B('mb1','The Final Empire','Brandon Sanderson','Cosmere — Mistborn Era 1'),
-  B('mb2','The Well of Ascension','Brandon Sanderson','Cosmere — Mistborn Era 1'),
-  B('mb3','The Hero of Ages','Brandon Sanderson','Cosmere — Mistborn Era 1'),
-  // Cosmere — Mistborn Era 2
-  B('mb4','The Alloy of Law','Brandon Sanderson','Cosmere — Mistborn Era 2'),
-  B('mb5','Shadows of Self','Brandon Sanderson','Cosmere — Mistborn Era 2'),
-  B('mb6','The Bands of Mourning','Brandon Sanderson','Cosmere — Mistborn Era 2'),
-  B('mb7','The Lost Metal','Brandon Sanderson','Cosmere — Mistborn Era 2'),
-  // Cosmere — Warbreaker
-  B('cwb','Warbreaker','Brandon Sanderson','Cosmere — Warbreaker'),
-  // Cosmere — Stormlight Archive
-  B('sa1','The Way of Kings','Brandon Sanderson','Cosmere — Stormlight Archive'),
-  B('sa2','Words of Radiance','Brandon Sanderson','Cosmere — Stormlight Archive'),
-  B('sa3','Oathbringer','Brandon Sanderson','Cosmere — Stormlight Archive'),
-  B('sa4','Rhythm of War','Brandon Sanderson','Cosmere — Stormlight Archive'),
-  B('sa5','Wind and Truth','Brandon Sanderson','Cosmere — Stormlight Archive'),
-  // Cosmere — Secret Projects
-  B('sp1','Tress of the Emerald Sea','Brandon Sanderson','Cosmere — Secret Projects'),
-  B('sp2','Yumi and the Nightmare Painter','Brandon Sanderson','Cosmere — Secret Projects'),
-  B('sp3','The Sunlit Man','Brandon Sanderson','Cosmere — Secret Projects'),
-  B('sp4','Isles of the Emberdark','Brandon Sanderson','Cosmere — Secret Projects'),
-  // Robin Hobb — Farseer
-  B('rh1',"Assassin's Apprentice",'Robin Hobb','Farseer Trilogy'),
-  B('rh2','Royal Assassin','Robin Hobb','Farseer Trilogy'),
-  B('rh3',"Assassin's Quest",'Robin Hobb','Farseer Trilogy'),
-  // Robin Hobb — Liveship Traders
-  B('rh4','Ship of Magic','Robin Hobb','Liveship Traders'),
-  B('rh5','The Mad Ship','Robin Hobb','Liveship Traders'),
-  B('rh6','Ship of Destiny','Robin Hobb','Liveship Traders'),
-  // Robin Hobb — Tawny Man
-  B('rh7',"Fool's Errand",'Robin Hobb','Tawny Man Trilogy'),
-  B('rh8','Golden Fool','Robin Hobb','Tawny Man Trilogy'),
-  B('rh9',"Fool's Fate",'Robin Hobb','Tawny Man Trilogy'),
-  // Robin Hobb — Rain Wild Chronicles
-  B('rh10','Dragon Keeper','Robin Hobb','Rain Wild Chronicles'),
-  B('rh11','Dragon Haven','Robin Hobb','Rain Wild Chronicles'),
-  B('rh12','City of Dragons','Robin Hobb','Rain Wild Chronicles'),
-  B('rh13','Blood of Dragons','Robin Hobb','Rain Wild Chronicles'),
-  // Robin Hobb — Fitz and the Fool
-  B('rh14',"Fool's Assassin",'Robin Hobb','Fitz and the Fool'),
-  B('rh15',"Fool's Quest",'Robin Hobb','Fitz and the Fool'),
-  B('rh16',"Assassin's Fate",'Robin Hobb','Fitz and the Fool'),
-  // Dungeon Crawler Carl (8)
-  B('dc1','Dungeon Crawler Carl','Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc2',"Carl's Doomsday Scenario",'Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc3',"The Dungeon Anarchist's Cookbook",'Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc4','The Gate of the Feral Gods','Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc5',"The Butcher's Masquerade",'Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc6','The Eye of the Bedlam Bride','Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc7','This Inevitable Ruin','Matt Dinniman','Dungeon Crawler Carl'),
-  B('dc8','A Parade of Horribles','Matt Dinniman','Dungeon Crawler Carl'),
-  // Andy Weir
-  B('aw1','The Martian','Andy Weir','Andy Weir'),
-  B('aw2','Artemis','Andy Weir','Andy Weir'),
-  B('aw3','Project Hail Mary','Andy Weir','Andy Weir'),
-  // Dark Elf Trilogy
-  B('de1','Homeland','R.A. Salvatore','The Dark Elf Trilogy'),
-  B('de2','Exile','R.A. Salvatore','The Dark Elf Trilogy'),
-  B('de3','Sojourn','R.A. Salvatore','The Dark Elf Trilogy'),
-  // A Song of Ice and Fire
-  B('got1','A Game of Thrones','George R.R. Martin','A Song of Ice and Fire'),
-  B('got2','A Clash of Kings','George R.R. Martin','A Song of Ice and Fire'),
-  B('got3','A Storm of Swords','George R.R. Martin','A Song of Ice and Fire'),
-  B('got4','A Feast for Crows','George R.R. Martin','A Song of Ice and Fire'),
-  B('got5','A Dance with Dragons','George R.R. Martin','A Song of Ice and Fire'),
-  // Sun Eater (6)
-  B('se1','Empire of Silence','Christopher Ruocchio','Sun Eater'),
-  B('se2','Howling Dark','Christopher Ruocchio','Sun Eater'),
-  B('se3','Demon in White','Christopher Ruocchio','Sun Eater'),
-  B('se4','Kingdoms of Death','Christopher Ruocchio','Sun Eater'),
-  B('se5','Ashes of Man','Christopher Ruocchio','Sun Eater'),
-  B('se6','Disquiet Gods','Christopher Ruocchio','Sun Eater'),
-  // Night Angel
-  B('na1','The Way of Shadows','Brent Weeks','Night Angel'),
-  B('na2',"Shadow's Edge",'Brent Weeks','Night Angel'),
-  B('na3','Beyond the Shadows','Brent Weeks','Night Angel'),
-  // Gentleman Bastard
-  B('gb1','The Lies of Locke Lamora','Scott Lynch','Gentleman Bastard'),
-  B('gb2','Red Seas Under Red Skies','Scott Lynch','Gentleman Bastard'),
-  B('gb3','The Republic of Thieves','Scott Lynch','Gentleman Bastard'),
-  // Blackwing / Raven's Mark
-  B('bw1','Blackwing','Ed McDonald',"Raven's Mark"),
-  B('bw2','Ravencry','Ed McDonald',"Raven's Mark"),
-  B('bw3','Crowfall','Ed McDonald',"Raven's Mark"),
-  // Blood Over Bright Haven
-  B('bobh','Blood Over Bright Haven','M.L. Wang','Standalone'),
-  // Fourth Wing / The Empyrean
-  B('fw1','Fourth Wing','Rebecca Yarros','The Empyrean'),
-  B('fw2','Iron Flame','Rebecca Yarros','The Empyrean'),
-  B('fw3','Onyx Storm','Rebecca Yarros','The Empyrean'),
-  // Bound and Broken
-  B('bb1','A Promise of Peril','Philip Chase','Bound and Broken'),
-  B('bb2','A Burden of Blood','Philip Chase','Bound and Broken'),
-  B('bb3','A Covenant of Ruin','Philip Chase','Bound and Broken'),
-  B('bb4','A Throne of Ashes','Philip Chase','Bound and Broken'),
-  B('bb5','A Crown of Betrayal','Philip Chase','Bound and Broken'),
-  // Children of Time
-  B('ct1','Children of Time','Adrian Tchaikovsky','Children of Time'),
-  B('ct2','Children of Ruin','Adrian Tchaikovsky','Children of Time'),
-  B('ct3','Children of Memory','Adrian Tchaikovsky','Children of Time'),
-  // Queen's Thief
-  B('qt1','The Thief','Megan Whalen Turner',"The Queen's Thief"),
-  B('qt2','The Queen of Attolia','Megan Whalen Turner',"The Queen's Thief"),
-  B('qt3','The King of Attolia','Megan Whalen Turner',"The Queen's Thief"),
-  B('qt4','A Conspiracy of Kings','Megan Whalen Turner',"The Queen's Thief"),
-  B('qt5','Thick as Thieves','Megan Whalen Turner',"The Queen's Thief"),
-  B('qt6','Return of the Thief','Megan Whalen Turner',"The Queen's Thief"),
-  // Black Company
-  B('bc1','The Black Company','Glen Cook','The Black Company'),
-  B('bc2','Shadows Linger','Glen Cook','The Black Company'),
-  B('bc3','The White Rose','Glen Cook','The Black Company'),
-  B('bc4','Shadow Games','Glen Cook','The Black Company'),
-  B('bc5','Dreams of Steel','Glen Cook','The Black Company'),
-  B('bc6','Bleak Seasons','Glen Cook','The Black Company'),
-  B('bc7','She Is the Darkness','Glen Cook','The Black Company'),
-  B('bc8','Water Sleeps','Glen Cook','The Black Company'),
-  B('bc9','Soldiers Live','Glen Cook','The Black Company'),
-  // First Law
-  B('fl1','The Blade Itself','Joe Abercrombie','The First Law'),
-  B('fl2','Before They Are Hanged','Joe Abercrombie','The First Law'),
-  B('fl3','Last Argument of Kings','Joe Abercrombie','The First Law'),
-  // First Law World standalones
-  B('fl4','Best Served Cold','Joe Abercrombie','First Law World'),
-  B('fl5','The Heroes','Joe Abercrombie','First Law World'),
-  B('fl6','Red Country','Joe Abercrombie','First Law World'),
-  B('fl7','Sharp Ends','Joe Abercrombie','First Law World'),
-  // Age of Madness
-  B('fl8','A Little Hatred','Joe Abercrombie','The Age of Madness'),
-  B('fl9','The Trouble with Peace','Joe Abercrombie','The Age of Madness'),
-  B('fl10','The Wisdom of Crowds','Joe Abercrombie','The Age of Madness'),
-  // Kingkiller Chronicle
-  B('kk1','The Name of the Wind','Patrick Rothfuss','The Kingkiller Chronicle'),
-  B('kk2',"The Wise Man's Fear",'Patrick Rothfuss','The Kingkiller Chronicle'),
-  B('kk3','The Doors of Stone','Patrick Rothfuss','The Kingkiller Chronicle'),
-  // The Witcher
-  B('w1','The Last Wish','Andrzej Sapkowski','The Witcher'),
-  B('w2','Sword of Destiny','Andrzej Sapkowski','The Witcher'),
-  B('w3','Blood of Elves','Andrzej Sapkowski','The Witcher'),
-  B('w4','The Time of Contempt','Andrzej Sapkowski','The Witcher'),
-  B('w5','Baptism of Fire','Andrzej Sapkowski','The Witcher'),
-  B('w6','The Tower of the Swallow','Andrzej Sapkowski','The Witcher'),
-  B('w7','The Lady of the Lake','Andrzej Sapkowski','The Witcher'),
-  B('w8','Season of Storms','Andrzej Sapkowski','The Witcher'),
-  // The Invisible Library
-  B('il1','The Invisible Library','Genevieve Cogman','The Invisible Library'),
-  B('il2','The Masked City','Genevieve Cogman','The Invisible Library'),
-  B('il3','The Burning Page','Genevieve Cogman','The Invisible Library'),
-  B('il4','The Lost Plot','Genevieve Cogman','The Invisible Library'),
-  B('il5','The Secret Chapter','Genevieve Cogman','The Invisible Library'),
-  B('il6','The Dark Archive','Genevieve Cogman','The Invisible Library'),
-  B('il7','The Untold Story','Genevieve Cogman','The Invisible Library'),
-  // Shadow Campaigns
-  B('sc1','The Thousand Names','Django Wexler','The Shadow Campaigns'),
-  B('sc2','The Shadow Throne','Django Wexler','The Shadow Campaigns'),
-  B('sc3','The Price of Valor','Django Wexler','The Shadow Campaigns'),
-  B('sc4','The Guns of Empire','Django Wexler','The Shadow Campaigns'),
-  B('sc5','The Infernal Battalion','Django Wexler','The Shadow Campaigns'),
-  // The Band
-  B('tb1','King of the Wylds','Nicholas Eames','The Band'),
-  B('tb2','Bloody Rose','Nicholas Eames','The Band'),
-  // The Combat Codes
-  B('cmc1','The Combat Codes','Alexander Darwin','The Combat Codes'),
-  B('cmc2',"Grievar's Blood",'Alexander Darwin','The Combat Codes'),
-  B('cmc3','The Longing for Light','Alexander Darwin','The Combat Codes'),
-];
-
-function load(){
-  try{
-    const d=localStorage.getItem(KEY);
-    if(d){
-      const parsed=JSON.parse(d);
-      if(parsed&&parsed.length){books=parsed;return;}
-    }
-  }catch(e){}
-  books=SEED.map(b=>({...b}));
-  save();
+  if (error) {
+    console.error('Fetch error:', error);
+    showToast('Error loading shelf');
+    return;
+  }
+  
+  books = data || [];
+  render();
 }
 
 function getAvg(book){
@@ -532,7 +288,7 @@ function getAvg(book){
   return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
 }
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 function render(){
   const sorted=[...books].sort((a,b)=>{
@@ -564,10 +320,25 @@ function render(){
   });
 }
 
-function setRating(id,rater,val){
-  const b=books.find(x=>x.id===id);if(!b)return;
-  b.ratings[rater]=(b.ratings[rater]===val)?0:val;
-  save();render();
+// 4. UPDATED RATING: Sync to Supabase
+async function setRating(id, rater, val) {
+  const b = books.find(x => x.id === id);
+  if (!b) return;
+
+  const newVal = (b.ratings[rater] === val) ? 0 : val;
+  const updatedRatings = { ...b.ratings, [rater]: newVal };
+
+  const { error } = await _supabase
+    .from('books')
+    .update({ ratings: updatedRatings })
+    .eq('id', id);
+
+  if (error) {
+    showToast('Error saving rating');
+  } else {
+    b.ratings[rater] = newVal;
+    render();
+  }
 }
 
 function openModal(id,rater){
@@ -581,12 +352,29 @@ function openModal(id,rater){
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');modalState=null;}
 function closeModalOnBg(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
-function saveReview(){
-  if(!modalState)return;
-  const b=books.find(x=>x.id===modalState.id);if(!b)return;
-  if(!b.reviews)b.reviews={};
-  b.reviews[modalState.rater]=document.getElementById('modal-textarea').value.trim();
-  save();render();closeModal();showToast('Review saved ✓');
+
+// 5. UPDATED REVIEW: Sync to Supabase
+async function saveReview() {
+  if (!modalState) return;
+  const b = books.find(x => x.id === modalState.id);
+  if (!b) return;
+
+  const newReviewText = document.getElementById('modal-textarea').value.trim();
+  const updatedReviews = { ...b.reviews, [modalState.rater]: newReviewText };
+
+  const { error } = await _supabase
+    .from('books')
+    .update({ reviews: updatedReviews })
+    .eq('id', b.id);
+
+  if (error) {
+    showToast('Error saving review');
+  } else {
+    b.reviews[modalState.rater] = newReviewText;
+    render();
+    closeModal();
+    showToast('Review saved ✓');
+  }
 }
 
 function switchTab(name){
@@ -606,11 +394,9 @@ function resetCoverPreview(){
   const img=document.getElementById('cover-preview-img');
   img.classList.remove('loaded');img.src='';coverUrl=null;
   document.getElementById('cover-status').textContent='awaiting title...';
-  document.getElementById('cover-status').className='cover-status';
 }
 async function fetchCoverPreview(title,author){
   document.getElementById('cover-status').textContent='searching...';
-  document.getElementById('cover-status').className='cover-status';
   try{
     const q=encodeURIComponent(title+' '+author);
     const resp=await fetch(`https://openlibrary.org/search.json?q=${q}&fields=isbn,cover_edition_key&limit=5`);
@@ -622,62 +408,51 @@ async function fetchCoverPreview(title,author){
     }
     if(found){
       const ok=await testImg(found);
-      if(ok){coverUrl=found;const img=document.getElementById('cover-preview-img');img.src=found;img.classList.add('loaded');document.getElementById('cover-status').textContent='cover found!';document.getElementById('cover-status').className='cover-status found';return;}
+      if(ok){coverUrl=found;const img=document.getElementById('cover-preview-img');img.src=found;img.classList.add('loaded');document.getElementById('cover-status').textContent='cover found!';return;}
     }
     noCover();
   }catch(e){noCover();}
 }
-function noCover(){coverUrl=null;document.getElementById('cover-preview-img').classList.remove('loaded');document.getElementById('cover-status').textContent='no cover — placeholder used';document.getElementById('cover-status').className='cover-status not-found';}
+function noCover(){coverUrl=null;document.getElementById('cover-preview-img').classList.remove('loaded');document.getElementById('cover-status').textContent='no cover — placeholder used';}
 
-async function addBook(){
-  const title=document.getElementById('input-title').value.trim();
-  const author=document.getElementById('input-author').value.trim();
-  if(!title||!author)return;
-  books.push({id:'b'+Date.now(),title,author,series:'',coverUrl:coverUrl||null,ratings:{darian:0,joey:0,jami:0},reviews:{darian:'',joey:'',jami:''}});
-  save();
-  document.getElementById('input-title').value='';document.getElementById('input-author').value='';
-  resetCoverPreview();document.getElementById('btn-add').disabled=true;
-  showToast(`"${title}" added!`);setTimeout(()=>switchTab('shelf'),700);render();
+// 6. UPDATED ADD: Sync to Supabase
+async function addBook() {
+  const title = document.getElementById('input-title').value.trim();
+  const author = document.getElementById('input-author').value.trim();
+  if (!title || !author) return;
+
+  const newBook = {
+    title,
+    author,
+    series: '',
+    coverUrl: coverUrl || null,
+    ratings: { darian: 0, joey: 0, jami: 0 },
+    reviews: { darian: '', joey: '', jami: '' }
+  };
+
+  const { data, error } = await _supabase
+    .from('books')
+    .insert([newBook])
+    .select();
+
+  if (error) {
+    showToast('Error adding book');
+  } else {
+    books.push(data[0]);
+    document.getElementById('input-title').value = '';
+    document.getElementById('input-author').value = '';
+    resetCoverPreview();
+    document.getElementById('btn-add').disabled = true;
+    showToast(`"${title}" added!`);
+    setTimeout(() => switchTab('shelf'), 700);
+    render();
+  }
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-
 function testImg(src){return new Promise(res=>{const i=new Image();i.onload=()=>res(i.naturalWidth>1);i.onerror=()=>res(false);i.src=src;setTimeout(()=>res(false),5000);});}
 
-// Auto-fetch covers for seed books
-async function autoFetchCovers(){
-  const need=books.filter(b=>!b.coverUrl);
-  if(!need.length)return;
-  const total=need.length;
-  let done=0;
-  const fs=document.getElementById('fetch-status');
-  const update=()=>{if(fs)fs.textContent=done<total?`Loading covers... ${done}/${total}`:'';};
-  update();
-  for(let i=0;i<need.length;i+=2){
-    const batch=need.slice(i,i+2);
-    await Promise.all(batch.map(async book=>{
-      try{
-        const q=encodeURIComponent(book.title+' '+book.author);
-        const resp=await fetch(`https://openlibrary.org/search.json?q=${q}&fields=isbn,cover_edition_key&limit=3`);
-        if(!resp.ok)return;
-        const data=await resp.json();
-        for(const doc of(data.docs||[])){
-          let c=null;
-          if(doc.cover_edition_key)c=`https://covers.openlibrary.org/b/olid/${doc.cover_edition_key}-L.jpg`;
-          else if(doc.isbn&&doc.isbn.length)c=`https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`;
-          if(c){const ok=await testImg(c);if(ok){book.coverUrl=c;break;}}
-        }
-      }catch(e){}
-      done++;update();
-    }));
-    if(i%20===0&&i>0){save();render();}
-    await new Promise(r=>setTimeout(r,150));
-  }
-  save();render();if(fs)fs.textContent='';
-}
-
-load();render();
-setTimeout(autoFetchCovers,1000);
+load();
 </script>
 </body>
 </html>
