@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* CSS remains identical to your original */
+/* ... Keeping your original CSS ... */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#12101a;--bg2:#1a1726;--bg3:#211e30;--card:#1e1b2e;--card2:#252238;
@@ -42,7 +42,7 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 .empty-state{grid-column:1/-1;text-align:center;padding:5rem 2rem}
 .empty-state p{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:var(--text3)}
 .empty-state small{display:block;margin-top:.5rem;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--text3)}
-.book-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+.book-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;}
 .book-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 16px 40px rgba(0,0,0,.5)}
 .book-cover-wrap{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--bg3)}
 .book-cover-img{width:100%;height:100%;object-fit:cover;display:block}
@@ -52,6 +52,12 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 .cover-overlay{position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,rgba(18,16,26,.92) 0%,transparent 100%);pointer-events:none}
 .avg-badge{position:absolute;top:10px;right:10px;background:rgba(18,16,26,.85);border:1px solid var(--gold2);border-radius:20px;padding:3px 9px;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--gold)}
 .series-badge{position:absolute;top:10px;left:10px;background:rgba(18,16,26,.85);border:1px solid rgba(200,168,255,.3);border-radius:20px;padding:2px 7px;font-family:'Space Mono',monospace;font-size:.56rem;color:var(--accent);max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* DELETE BUTTON STYLING */
+.btn-delete{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(20,15,30,0.8);border:1px solid var(--border);color:var(--text3);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;transition:all 0.2s;opacity:0;}
+.book-card:hover .btn-delete{opacity:1;}
+.btn-delete:hover{background:rgba(200,100,100,0.2);color:var(--accent2);border-color:var(--accent2);}
+
 .book-info{padding:.82rem .88rem .68rem}
 .book-title{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;line-height:1.3;color:var(--text);margin-bottom:.2rem}
 .book-author{font-family:'Crimson Pro',serif;font-style:italic;font-size:.82rem;color:var(--text2);margin-bottom:.82rem}
@@ -256,9 +262,9 @@ main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.2
 <div class="toast" id="toast"></div>
 
 <script>
-// 2. INITIALIZE SUPABASE
-const SUPABASE_URL = 'YOUR_API_URL_HERE';
-const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE';
+// !!! IMPORTANT: ADD YOUR KEYS HERE !!!
+const SUPABASE_URL = 'https://cuysbqmrvgpjgcszqyre.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eXNicW1ydmdwamdjc3pxeXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxODc0ODgsImV4cCI6MjA5MTc2MzQ4OH0.4EKpwBkHkBmoGuBxT79mkqNgkA0RH-aTbQ27DhqBMi4';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const RATERS=['darian','joey','jami'];
@@ -267,7 +273,6 @@ let modalState=null;
 let coverUrl=null;
 let coverTimer=null;
 
-// 3. UPDATED LOAD: Fetch from Supabase
 async function load() {
   const { data, error } = await _supabase
     .from('books')
@@ -275,7 +280,7 @@ async function load() {
 
   if (error) {
     console.error('Fetch error:', error);
-    showToast('Error loading shelf');
+    showToast('Error loading shelf - Check API keys');
     return;
   }
   
@@ -315,30 +320,45 @@ function render(){
       const stars=[1,2,3,4,5].map(i=>`<span class="star ${v>=i?'on':''}" onclick="setRating('${book.id}','${r}',${i})">${v>=i?'★':'☆'}</span>`).join('');
       return`<div class="rater-row"><span class="rater-label ${r}">${r}</span><div class="stars">${stars}</div><span class="review-icon ${hr?'has-review':'no-review'}" onclick="openModal('${book.id}','${r}')">✎</span></div>`;
     }).join('');
-    card.innerHTML=`<div class="book-cover-wrap">${coverHtml}<div class="cover-overlay"></div>${avgB}${serB}</div><div class="book-info"><div class="book-title">${esc(book.title)}</div><div class="book-author">${esc(book.author)}</div><div class="ratings-block">${ratingHtml}</div></div>`;
+    
+    // ADDED DELETE BUTTON IN HTML BELOW
+    card.innerHTML=`
+      <button class="btn-delete" onclick="deleteBook('${book.id}', '${esc(book.title)}')">×</button>
+      <div class="book-cover-wrap">${coverHtml}<div class="cover-overlay"></div>${avgB}${serB}</div>
+      <div class="book-info">
+        <div class="book-title">${esc(book.title)}</div>
+        <div class="book-author">${esc(book.author)}</div>
+        <div class="ratings-block">${ratingHtml}</div>
+      </div>`;
     grid.appendChild(card);
   });
 }
 
-// 4. UPDATED RATING: Sync to Supabase
-async function setRating(id, rater, val) {
-  const b = books.find(x => x.id === id);
-  if (!b) return;
-
-  const newVal = (b.ratings[rater] === val) ? 0 : val;
-  const updatedRatings = { ...b.ratings, [rater]: newVal };
+// DELETE FUNCTION
+async function deleteBook(id, title) {
+  if (!confirm(`Are you sure you want to remove "${title}" from the shelf?`)) return;
 
   const { error } = await _supabase
     .from('books')
-    .update({ ratings: updatedRatings })
+    .delete()
     .eq('id', id);
 
   if (error) {
-    showToast('Error saving rating');
+    showToast('Error deleting book');
   } else {
-    b.ratings[rater] = newVal;
+    books = books.filter(b => b.id !== id);
     render();
+    showToast(`Removed "${title}"`);
   }
+}
+
+async function setRating(id, rater, val) {
+  const b = books.find(x => x.id === id);
+  if (!b) return;
+  const newVal = (b.ratings[rater] === val) ? 0 : val;
+  const updatedRatings = { ...b.ratings, [rater]: newVal };
+  const { error } = await _supabase.from('books').update({ ratings: updatedRatings }).eq('id', id);
+  if (error) { showToast('Error saving rating'); } else { b.ratings[rater] = newVal; render(); }
 }
 
 function openModal(id,rater){
@@ -353,28 +373,14 @@ function openModal(id,rater){
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');modalState=null;}
 function closeModalOnBg(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
-// 5. UPDATED REVIEW: Sync to Supabase
 async function saveReview() {
   if (!modalState) return;
   const b = books.find(x => x.id === modalState.id);
   if (!b) return;
-
   const newReviewText = document.getElementById('modal-textarea').value.trim();
   const updatedReviews = { ...b.reviews, [modalState.rater]: newReviewText };
-
-  const { error } = await _supabase
-    .from('books')
-    .update({ reviews: updatedReviews })
-    .eq('id', b.id);
-
-  if (error) {
-    showToast('Error saving review');
-  } else {
-    b.reviews[modalState.rater] = newReviewText;
-    render();
-    closeModal();
-    showToast('Review saved ✓');
-  }
+  const { error } = await _supabase.from('books').update({ reviews: updatedReviews }).eq('id', b.id);
+  if (error) { showToast('Error saving review'); } else { b.reviews[modalState.rater] = newReviewText; render(); closeModal(); showToast('Review saved ✓'); }
 }
 
 function switchTab(name){
@@ -415,7 +421,6 @@ async function fetchCoverPreview(title,author){
 }
 function noCover(){coverUrl=null;document.getElementById('cover-preview-img').classList.remove('loaded');document.getElementById('cover-status').textContent='no cover — placeholder used';}
 
-// 6. UPDATED ADD: Sync to Supabase
 async function addBook() {
   const title = document.getElementById('input-title').value.trim();
   const author = document.getElementById('input-author').value.trim();
@@ -437,6 +442,7 @@ async function addBook() {
 
   if (error) {
     showToast('Error adding book');
+    console.error(error);
   } else {
     books.push(data[0]);
     document.getElementById('input-title').value = '';
